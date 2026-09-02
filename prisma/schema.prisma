@@ -1,0 +1,376 @@
+// ==========================================================
+// Blood Donation & Emergency Assistance Platform
+// Prisma Schema — PostgreSQL
+// ==========================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ------------------------------------------------------------
+// ENUMS
+// ------------------------------------------------------------
+
+enum Role {
+  DONOR
+  HOSPITAL
+  ADMIN
+}
+
+enum AuthProvider {
+  LOCAL
+  GOOGLE
+}
+
+enum BloodGroup {
+  A_POSITIVE
+  A_NEGATIVE
+  B_POSITIVE
+  B_NEGATIVE
+  AB_POSITIVE
+  AB_NEGATIVE
+  O_POSITIVE
+  O_NEGATIVE
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum UrgencyLevel {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum RequestStatus {
+  PENDING_VERIFICATION
+  VERIFIED
+  MATCHING
+  PARTIALLY_FULFILLED
+  FULFILLED
+  CANCELLED
+  EXPIRED
+}
+
+enum MatchStatus {
+  NOTIFIED
+  ACCEPTED
+  DECLINED
+  EXPIRED
+  COMPLETED
+}
+
+enum DonationStatus {
+  SCHEDULED
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum PaymentProvider {
+  BKASH
+  STRIPE
+  SSLCOMMERZ
+}
+
+enum PaymentPurpose {
+  PRIORITY_REQUEST_FEE // hospital pays to boost/expedite an emergency request
+  HOSPITAL_VERIFICATION_FEE // one-time fee to get hospital account verified
+  PLATFORM_DONATION // monetary donation from any user to support the platform/blood drives
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  CANCELLED
+  REFUNDED
+}
+
+enum NotificationType {
+  BLOOD_REQUEST_MATCH
+  REQUEST_VERIFIED
+  REQUEST_FULFILLED
+  DONATION_REMINDER
+  PAYMENT_STATUS
+  GENERAL
+}
+
+// ------------------------------------------------------------
+// CORE: USER
+// ------------------------------------------------------------
+
+model User {
+  id              String       @id @default(uuid())
+  name            String
+  email           String       @unique
+  phone           String?      @unique
+  password        String? // nullable: social-login users have no local password
+  role            Role
+  provider        AuthProvider @default(LOCAL)
+  providerId      String? // Google sub id
+  avatar          String?
+  isEmailVerified Boolean      @default(false)
+  isActive        Boolean      @default(true)
+
+  donorProfile    DonorProfile?
+  hospitalProfile HospitalProfile?
+
+  refreshTokens RefreshToken[]
+  notifications Notification[]
+  payments      Payment[]
+  auditLogs     AuditLog[]       @relation("AuditActor")
+  verifiedHospitals HospitalProfile[] @relation("HospitalVerifiedBy")
+  verifiedRequests  BloodRequest[]    @relation("RequestVerifiedBy")
+
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([role])
+  @@index([email])
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  revoked   Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@map("refresh_tokens")
+}
+
+// ------------------------------------------------------------
+// DONOR
+// ------------------------------------------------------------
+
+model DonorProfile {
+  id               String     @id @default(uuid())
+  userId           String     @unique
+  user             User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bloodGroup       BloodGroup
+  dateOfBirth      DateTime
+  gender           Gender
+  weightKg         Float
+  address          String
+  city             String
+  latitude         Float
+  longitude        Float
+  isAvailable      Boolean    @default(true)
+  lastDonationDate DateTime?
+  totalDonations   Int        @default(0)
+  medicalNotes     String?
+
+  matches   RequestMatch[]
+  donations Donation[]
+
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([bloodGroup, city, isAvailable])
+  @@index([latitude, longitude])
+  @@map("donor_profiles")
+}
+
+// ------------------------------------------------------------
+// HOSPITAL
+// ------------------------------------------------------------
+
+model HospitalProfile {
+  id                 String    @id @default(uuid())
+  userId             String    @unique
+  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  hospitalName       String
+  registrationNumber String    @unique
+  address            String
+  city               String
+  latitude           Float
+  longitude          Float
+  isVerified         Boolean   @default(false)
+  verifiedById       String?
+  verifiedBy         User?     @relation("HospitalVerifiedBy", fields: [verifiedById], references: [id])
+  verifiedAt         DateTime?
+
+  bloodRequests BloodRequest[]
+
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([city, isVerified])
+  @@map("hospital_profiles")
+}
+
+// ------------------------------------------------------------
+// BLOOD REQUEST
+// ------------------------------------------------------------
+
+model BloodRequest {
+  id             String        @id @default(uuid())
+  hospitalId     String
+  hospital       HospitalProfile @relation(fields: [hospitalId], references: [id])
+  patientName    String
+  patientAge     Int?
+  bloodGroup     BloodGroup
+  unitsNeeded    Int
+  unitsFulfilled Int           @default(0)
+  urgency        UrgencyLevel
+  status         RequestStatus @default(PENDING_VERIFICATION)
+  reason         String?
+  requiredBy     DateTime
+  city           String
+  latitude       Float
+  longitude      Float
+
+  isVerified   Boolean   @default(false)
+  verifiedById String?
+  verifiedBy   User?     @relation("RequestVerifiedBy", fields: [verifiedById], references: [id])
+  verifiedAt   DateTime?
+
+  matches       RequestMatch[]
+  donations     Donation[]
+  payments      Payment[]
+  notifications Notification[]
+
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([bloodGroup, status, city])
+  @@index([urgency, status])
+  @@index([latitude, longitude])
+  @@map("blood_requests")
+}
+
+// Junction: which donors were matched/notified for which request
+model RequestMatch {
+  id             String       @id @default(uuid())
+  bloodRequestId String
+  bloodRequest   BloodRequest @relation(fields: [bloodRequestId], references: [id], onDelete: Cascade)
+  donorProfileId String
+  donorProfile   DonorProfile @relation(fields: [donorProfileId], references: [id], onDelete: Cascade)
+  status         MatchStatus  @default(NOTIFIED)
+  notifiedAt     DateTime     @default(now())
+  respondedAt    DateTime?
+
+  donation Donation?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([bloodRequestId, donorProfileId]) // prevents duplicate donor assignment
+  @@index([status])
+  @@map("request_matches")
+}
+
+// ------------------------------------------------------------
+// DONATION
+// ------------------------------------------------------------
+
+model Donation {
+  id             String         @id @default(uuid())
+  bloodRequestId String?
+  bloodRequest   BloodRequest?  @relation(fields: [bloodRequestId], references: [id])
+  donorProfileId String
+  donorProfile   DonorProfile   @relation(fields: [donorProfileId], references: [id])
+  requestMatchId String?        @unique
+  requestMatch   RequestMatch?  @relation(fields: [requestMatchId], references: [id])
+  unitsDonated   Int            @default(1)
+  donationDate   DateTime
+  status         DonationStatus @default(SCHEDULED)
+  location       String?
+  notes          String?
+
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([donorProfileId, status])
+  @@index([donationDate])
+  @@map("donations")
+}
+
+// ------------------------------------------------------------
+// PAYMENT
+// ------------------------------------------------------------
+
+model Payment {
+  id              String          @id @default(uuid())
+  userId          String
+  user            User            @relation(fields: [userId], references: [id])
+  bloodRequestId  String?
+  bloodRequest    BloodRequest?   @relation(fields: [bloodRequestId], references: [id])
+  purpose         PaymentPurpose
+  provider        PaymentProvider
+  amount          Decimal         @db.Decimal(10, 2)
+  currency        String          @default("BDT")
+  transactionId   String          @unique
+  gatewayResponse Json?
+  status          PaymentStatus   @default(PENDING)
+  paidAt          DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, status])
+  @@index([status])
+  @@map("payments")
+}
+
+// ------------------------------------------------------------
+// NOTIFICATION
+// ------------------------------------------------------------
+
+model Notification {
+  id             String           @id @default(uuid())
+  userId         String
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type           NotificationType
+  title          String
+  message        String
+  isRead         Boolean          @default(false)
+  bloodRequestId String?
+  bloodRequest   BloodRequest?    @relation(fields: [bloodRequestId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@index([userId, isRead])
+  @@map("notifications")
+}
+
+// ------------------------------------------------------------
+// AUDIT LOG
+// ------------------------------------------------------------
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  actorId    String?
+  actor      User?    @relation("AuditActor", fields: [actorId], references: [id])
+  action     String // e.g. "VERIFY_REQUEST", "UPDATE_ROLE", "SOFT_DELETE_USER"
+  entityType String // e.g. "BloodRequest", "User"
+  entityId   String
+  oldValue   Json?
+  newValue   Json?
+  ipAddress  String?
+
+  createdAt DateTime @default(now())
+
+  @@index([entityType, entityId])
+  @@index([actorId])
+  @@map("audit_logs")
+}
