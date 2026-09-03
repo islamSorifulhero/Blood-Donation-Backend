@@ -27,9 +27,7 @@ const requestListSelect = {
   hospital: { select: { id: true, hospitalName: true, city: true } },
 } satisfies Prisma.BloodRequestSelect;
 
-// ------------------------------------------------------------------
 // Create (HOSPITAL only — must already be verified)
-// ------------------------------------------------------------------
 export async function createBloodRequest(
   userId: string,
   data: {
@@ -71,9 +69,7 @@ export async function createBloodRequest(
   return created;
 }
 
-// ------------------------------------------------------------------
 // List — pagination + filtering + search + sorting
-// ------------------------------------------------------------------
 interface ListFilters {
   bloodGroup?: string;
   status?: string;
@@ -139,9 +135,7 @@ export async function listBloodRequests(filters: ListFilters, query: Request["qu
   return result;
 }
 
-// ------------------------------------------------------------------
 // Get by id
-// ------------------------------------------------------------------
 export async function getBloodRequestById(id: string, requester: AuthUser) {
   const request = await prisma.bloodRequest.findFirst({
     where: { id, deletedAt: null },
@@ -160,10 +154,8 @@ export async function getBloodRequestById(id: string, requester: AuthUser) {
   return request;
 }
 
-// ------------------------------------------------------------------
 // Admin verification — approves/rejects, and on approval runs the
 // donor-matching engine in the same transaction.
-// ------------------------------------------------------------------
 export async function verifyBloodRequest(id: string, actorId: string, isVerified: boolean, remarks?: string) {
   const request = await prisma.bloodRequest.findFirst({
     where: { id, deletedAt: null },
@@ -216,9 +208,7 @@ export async function verifyBloodRequest(id: string, actorId: string, isVerified
   return result;
 }
 
-// ------------------------------------------------------------------
 // Cancel — hospital owner or admin
-// ------------------------------------------------------------------
 export async function cancelBloodRequest(id: string, requester: AuthUser, reason?: string) {
   const request = await prisma.bloodRequest.findFirst({
     where: { id, deletedAt: null },
@@ -252,9 +242,7 @@ export async function cancelBloodRequest(id: string, requester: AuthUser, reason
   await bumpCacheVersion("blood-requests");
 }
 
-// ------------------------------------------------------------------
 // List matches for a request (hospital owner or admin)
-// ------------------------------------------------------------------
 export async function listMatchesForRequest(requestId: string, requester: AuthUser) {
   const request = await prisma.bloodRequest.findFirst({
     where: { id: requestId, deletedAt: null },
@@ -297,9 +285,7 @@ export async function listMatchesForRequest(requestId: string, requester: AuthUs
   }));
 }
 
-// ------------------------------------------------------------------
 // Donor responds to a match notification
-// ------------------------------------------------------------------
 export async function respondToMatch(
   requestId: string,
   matchId: string,
