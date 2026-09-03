@@ -7,9 +7,7 @@ import { recordAuditLog } from "../../utils/audit";
 import { createNotification } from "../../utils/notify";
 import { NotificationType } from "@prisma/client";
 
-// ------------------------------------------------------------------
 // User management
-// ------------------------------------------------------------------
 interface ListUsersFilters {
   role?: Role;
   isActive?: boolean;
@@ -119,9 +117,7 @@ export async function updateUserStatus(userId: string, actorId: string, isActive
   });
 }
 
-// ------------------------------------------------------------------
 // Dashboard analytics
-// ------------------------------------------------------------------
 export async function getDashboardStats() {
   const startOfMonth = new Date();
   startOfMonth.setDate(1);
@@ -176,9 +172,7 @@ export async function getDashboardStats() {
   };
 }
 
-// ------------------------------------------------------------------
 // Audit logs
-// ------------------------------------------------------------------
 interface AuditLogFilters {
   entityType?: string;
   action?: string;
