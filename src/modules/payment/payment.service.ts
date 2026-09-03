@@ -28,10 +28,8 @@ function purposeCode(purpose: PaymentPurpose): string {
   return { PRIORITY_REQUEST_FEE: "PRF", HOSPITAL_VERIFICATION_FEE: "HVF", PLATFORM_DONATION: "DON" }[purpose];
 }
 
-// ------------------------------------------------------------------
 // Initiate — resolves the amount/eligibility per purpose, creates a
 // PENDING Payment row, then calls the chosen gateway to open a session.
-// ------------------------------------------------------------------
 export async function initiatePayment(
   req: Request,
   user: AuthUser,
@@ -113,10 +111,8 @@ export async function initiatePayment(
   }
 }
 
-// ------------------------------------------------------------------
 // Central status-update function — every webhook/callback funnels here.
 // Idempotent: re-processing the same terminal status is a no-op.
-// ------------------------------------------------------------------
 export async function verifyAndUpdatePaymentStatus(
   transactionId: string,
   status: NormalizedStatus,
@@ -167,9 +163,7 @@ export async function verifyAndUpdatePaymentStatus(
   return updated;
 }
 
-// ------------------------------------------------------------------
 // List — role-scoped, paginated, filtered, sorted
-// ------------------------------------------------------------------
 interface ListFilters {
   status?: PaymentStatus;
   provider?: PaymentProvider;
