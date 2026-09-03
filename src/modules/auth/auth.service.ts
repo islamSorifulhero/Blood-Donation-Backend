@@ -14,7 +14,6 @@ interface Tokens {
   refreshToken: string;
 }
 
-/** Signs a fresh access+refresh pair and persists a hash of the refresh token. */
 async function issueTokens(payload: JwtPayload): Promise<Tokens> {
   const accessToken = signAccessToken(payload);
   const refreshToken = signRefreshToken(payload);
@@ -35,9 +34,7 @@ function sanitizeUser<T extends { password: string | null }>(user: T) {
   return rest;
 }
 
-// ------------------------------------------------------------------
 // Register: Donor
-// ------------------------------------------------------------------
 export async function registerDonor(input: {
   name: string;
   email: string;
@@ -92,9 +89,7 @@ export async function registerDonor(input: {
   return { user: sanitizeUser(user), tokens };
 }
 
-// ------------------------------------------------------------------
 // Register: Hospital  (account created unverified — Admin must verify)
-// ------------------------------------------------------------------
 export async function registerHospital(input: {
   name: string;
   email: string;
@@ -155,9 +150,7 @@ export async function registerHospital(input: {
   };
 }
 
-// ------------------------------------------------------------------
 // Login (email + password)
-// ------------------------------------------------------------------
 export async function login(email: string, password: string) {
   const user = await prisma.user.findFirst({ where: { email, deletedAt: null } });
   if (!user) throw ApiError.unauthorized("Invalid email or password");
@@ -175,9 +168,7 @@ export async function login(email: string, password: string) {
   return { user: sanitizeUser(user), tokens };
 }
 
-// ------------------------------------------------------------------
 // Google Social Login (sign-up on first use, sign-in thereafter)
-// ------------------------------------------------------------------
 export async function googleAuth(idToken: string, intendedRole?: Role) {
   const ticket = await googleClient.verifyIdToken({
     idToken,
@@ -224,9 +215,7 @@ export async function googleAuth(idToken: string, intendedRole?: Role) {
   return { user: sanitizeUser(user), tokens };
 }
 
-// ------------------------------------------------------------------
 // Refresh token rotation
-// ------------------------------------------------------------------
 export async function refreshTokens(rawToken: string): Promise<Tokens> {
   let decoded: JwtPayload;
   try {
@@ -251,9 +240,7 @@ export async function refreshTokens(rawToken: string): Promise<Tokens> {
   return issueTokens({ id: user.id, email: user.email, role: user.role });
 }
 
-// ------------------------------------------------------------------
 // Logout — revoke the refresh token so it can't be replayed
-// ------------------------------------------------------------------
 export async function logout(rawToken: string | undefined) {
   if (!rawToken) return;
   const tokenHash = hashToken(rawToken);
