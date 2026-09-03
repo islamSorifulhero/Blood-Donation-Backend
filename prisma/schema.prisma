@@ -1,7 +1,5 @@
-// ==========================================================
 // Blood Donation & Emergency Assistance Platform
 // Prisma Schema — PostgreSQL
-// ==========================================================
 
 generator client {
   provider = "prisma-client-js"
@@ -12,9 +10,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ------------------------------------------------------------
 // ENUMS
-// ------------------------------------------------------------
 
 enum Role {
   DONOR
@@ -105,9 +101,7 @@ enum NotificationType {
   GENERAL
 }
 
-// ------------------------------------------------------------
 // CORE: USER
-// ------------------------------------------------------------
 
 model User {
   id              String       @id @default(uuid())
@@ -154,9 +148,7 @@ model RefreshToken {
   @@map("refresh_tokens")
 }
 
-// ------------------------------------------------------------
 // DONOR
-// ------------------------------------------------------------
 
 model DonorProfile {
   id               String     @id @default(uuid())
@@ -187,9 +179,7 @@ model DonorProfile {
   @@map("donor_profiles")
 }
 
-// ------------------------------------------------------------
 // HOSPITAL
-// ------------------------------------------------------------
 
 model HospitalProfile {
   id                 String    @id @default(uuid())
@@ -216,9 +206,7 @@ model HospitalProfile {
   @@map("hospital_profiles")
 }
 
-// ------------------------------------------------------------
 // BLOOD REQUEST
-// ------------------------------------------------------------
 
 model BloodRequest {
   id             String        @id @default(uuid())
@@ -278,9 +266,7 @@ model RequestMatch {
   @@map("request_matches")
 }
 
-// ------------------------------------------------------------
 // DONATION
-// ------------------------------------------------------------
 
 model Donation {
   id             String         @id @default(uuid())
@@ -305,9 +291,7 @@ model Donation {
   @@map("donations")
 }
 
-// ------------------------------------------------------------
 // PAYMENT
-// ------------------------------------------------------------
 
 model Payment {
   id              String          @id @default(uuid())
@@ -332,9 +316,7 @@ model Payment {
   @@map("payments")
 }
 
-// ------------------------------------------------------------
 // NOTIFICATION
-// ------------------------------------------------------------
 
 model Notification {
   id             String           @id @default(uuid())
@@ -353,9 +335,7 @@ model Notification {
   @@map("notifications")
 }
 
-// ------------------------------------------------------------
 // AUDIT LOG
-// ------------------------------------------------------------
 
 model AuditLog {
   id         String   @id @default(uuid())
