@@ -44,10 +44,8 @@ export const getPaymentById = catchAsync(async (req: Request, res: Response) => 
   sendResponse(res, { statusCode: 200, message: "Payment fetched", data: payment });
 });
 
-// ------------------------------------------------------------------
 // Stripe webhook — mounted in app.ts with express.raw() BEFORE express.json(),
 // so req.body here is a Buffer, not parsed JSON. Do not move this route.
-// ------------------------------------------------------------------
 export const stripeWebhookHandler = catchAsync(async (req: Request, res: Response) => {
   const event = verifyStripeWebhook(req.body as Buffer, req.headers["stripe-signature"]);
   if (event) {
@@ -57,11 +55,9 @@ export const stripeWebhookHandler = catchAsync(async (req: Request, res: Respons
   res.status(200).json({ received: true });
 });
 
-// ------------------------------------------------------------------
 // SSLCommerz callbacks — the gateway POSTs form-encoded data directly from
 // the payer's browser to these URLs. The body is NOT trusted on its own;
 // success/fail must be re-validated against SSLCommerz's Validation API.
-// ------------------------------------------------------------------
 export const sslcommerzSuccess = catchAsync(async (req: Request, res: Response) => {
   const { val_id, tran_id } = req.body;
   if (!val_id || !tran_id) throw ApiError.badRequest("Missing val_id/tran_id in SSLCommerz callback");
