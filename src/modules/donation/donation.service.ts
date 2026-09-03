@@ -23,9 +23,7 @@ const donationInclude = {
   },
 } satisfies Prisma.DonationInclude;
 
-// ------------------------------------------------------------------
 // Schedule a donation from an ACCEPTED match (donor only, their own match)
-// ------------------------------------------------------------------
 export async function scheduleDonation(
   donorUserId: string,
   data: { requestMatchId: string; donationDate: Date; location?: string; notes?: string }
@@ -64,9 +62,7 @@ export async function scheduleDonation(
   });
 }
 
-// ------------------------------------------------------------------
 // List — role-scoped, paginated, filtered, sorted
-// ------------------------------------------------------------------
 interface ListFilters {
   status?: DonationStatus;
   bloodRequestId?: string;
@@ -107,9 +103,7 @@ export async function listDonations(filters: ListFilters, query: Request["query"
   return { items, meta: buildMeta(total, page, limit) };
 }
 
-// ------------------------------------------------------------------
 // Get by id — donor owner, hospital owner, or admin
-// ------------------------------------------------------------------
 export async function getDonationById(id: string, requester: AuthUser) {
   const donation = await prisma.donation.findFirst({ where: { id, deletedAt: null }, include: donationInclude });
   if (!donation) throw ApiError.notFound("Donation not found");
@@ -128,11 +122,9 @@ function assertCanAccess(
   }
 }
 
-// ------------------------------------------------------------------
 // Complete — the core transaction. Hospital owner or admin only.
 // Updates: donation status, donor totals/lastDonationDate, match status,
 // and the parent blood request's unitsFulfilled/status — all atomically.
-// ------------------------------------------------------------------
 export async function completeDonation(
   id: string,
   requester: AuthUser,
@@ -231,9 +223,7 @@ export async function completeDonation(
   return result;
 }
 
-// ------------------------------------------------------------------
 // Cancel a scheduled donation — donor, hospital owner, or admin
-// ------------------------------------------------------------------
 export async function cancelDonation(id: string, requester: AuthUser, reason?: string) {
   const donation = await prisma.donation.findFirst({
     where: { id, deletedAt: null },
@@ -258,9 +248,7 @@ export async function cancelDonation(id: string, requester: AuthUser, reason?: s
   });
 }
 
-// ------------------------------------------------------------------
 // Mark a scheduled donation as a no-show — hospital owner or admin
-// ------------------------------------------------------------------
 export async function markNoShow(id: string, requester: AuthUser, notes?: string) {
   const donation = await prisma.donation.findFirst({
     where: { id, deletedAt: null },
@@ -295,9 +283,7 @@ export async function markNoShow(id: string, requester: AuthUser, notes?: string
   });
 }
 
-// ------------------------------------------------------------------
 // Reschedule a scheduled donation — donor only
-// ------------------------------------------------------------------
 export async function rescheduleDonation(id: string, donorUserId: string, donationDate: Date, location?: string) {
   const donation = await prisma.donation.findFirst({
     where: { id, deletedAt: null },
