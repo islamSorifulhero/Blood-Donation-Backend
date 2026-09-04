@@ -1,0 +1,15 @@
+$kind: http-request
+url: "{{baseUrl}}/payments/initiate"
+method: POST
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{hospitalAccessToken}}
+body:
+  type: json
+  content: |-
+    {
+      "purpose": "PRIORITY_REQUEST_FEE",
+      "provider": "SSLCOMMERZ",
+      "bloodRequestId": "{{bloodRequestId}}"
+    }
+order: 2000

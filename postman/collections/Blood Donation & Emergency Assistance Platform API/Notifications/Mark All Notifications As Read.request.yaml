@@ -1,0 +1,10 @@
+$kind: http-request
+url: "{{baseUrl}}/notifications/read-all"
+method: PATCH
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{donorAccessToken}}
+body:
+  type: json
+  content: "{}"
+order: 4000

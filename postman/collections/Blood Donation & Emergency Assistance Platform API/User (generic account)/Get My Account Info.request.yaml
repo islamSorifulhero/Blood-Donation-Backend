@@ -1,0 +1,7 @@
+$kind: http-request
+description: Works for any role — basic account fields only.
+url: "{{baseUrl}}/users/me"
+method: GET
+headers:
+  Authorization: Bearer {{accessToken}}
+order: 1000

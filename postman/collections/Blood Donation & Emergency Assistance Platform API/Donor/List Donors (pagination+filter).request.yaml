@@ -1,0 +1,12 @@
+$kind: http-request
+url: "{{baseUrl}}/donors?bloodGroup=O_POSITIVE&city=Dhaka&isAvailable=true&page=1&limit=10"
+method: GET
+headers:
+  Authorization: Bearer {{hospitalAccessToken}}
+queryParams:
+  bloodGroup: O_POSITIVE
+  city: Dhaka
+  isAvailable: "true"
+  page: "1"
+  limit: "10"
+order: 3000

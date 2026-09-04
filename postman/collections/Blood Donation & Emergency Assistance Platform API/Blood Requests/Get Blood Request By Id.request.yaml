@@ -1,0 +1,6 @@
+$kind: http-request
+url: "{{baseUrl}}/blood-requests/{{bloodRequestId}}"
+method: GET
+headers:
+  Authorization: Bearer {{hospitalAccessToken}}
+order: 4000

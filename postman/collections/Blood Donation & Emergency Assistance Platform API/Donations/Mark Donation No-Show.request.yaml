@@ -1,0 +1,13 @@
+$kind: http-request
+url: "{{baseUrl}}/donations/{{donationId}}/no-show"
+method: PATCH
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{hospitalAccessToken}}
+body:
+  type: json
+  content: |-
+    {
+      "notes": "Did not arrive"
+    }
+order: 7000

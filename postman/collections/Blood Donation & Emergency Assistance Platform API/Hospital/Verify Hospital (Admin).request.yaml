@@ -1,0 +1,14 @@
+$kind: http-request
+description: Approves the hospital. Try isVerified=false with a remarks string to see the rejection path.
+url: "{{baseUrl}}/hospitals/{{hospitalId}}/verify"
+method: PATCH
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{adminAccessToken}}
+body:
+  type: json
+  content: |-
+    {
+      "isVerified": true
+    }
+order: 5000

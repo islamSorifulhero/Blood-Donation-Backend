@@ -1,0 +1,13 @@
+$kind: http-request
+url: "{{baseUrl}}/users/me"
+method: PATCH
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{accessToken}}
+body:
+  type: json
+  content: |-
+    {
+      "name": "Rahim Uddin Khan"
+    }
+order: 2000

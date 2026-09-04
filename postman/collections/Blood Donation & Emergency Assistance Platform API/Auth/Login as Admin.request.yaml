@@ -1,0 +1,18 @@
+$kind: http-request
+description: Login using the seeded demo admin credentials.
+url: "{{baseUrl}}/auth/login"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "email": "{{adminEmail}}",
+      "password": "{{adminPassword}}"
+    }
+scripts:
+  - type: afterResponse
+    code: if (pm.response.code === 200) { pm.collectionVariables.set('adminAccessToken', pm.response.json().data.accessToken); }
+    language: text/javascript
+order: 4000

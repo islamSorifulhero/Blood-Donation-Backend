@@ -1,0 +1,13 @@
+$kind: http-request
+url: "{{baseUrl}}/payments/callback/sslcommerz/success"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "val_id": "<val_id>",
+      "tran_id": "<transactionId>"
+    }
+order: 7000

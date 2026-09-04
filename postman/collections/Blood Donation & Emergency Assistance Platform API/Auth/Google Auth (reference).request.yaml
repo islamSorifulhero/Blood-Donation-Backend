@@ -1,0 +1,14 @@
+$kind: http-request
+description: First-time sign-up requires role=DONOR|HOSPITAL. Existing accounts log in regardless of role sent.
+url: "{{baseUrl}}/auth/google"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "idToken": "<google-id-token>",
+      "role": "DONOR"
+    }
+order: 5000

@@ -1,0 +1,12 @@
+$kind: http-request
+url: "{{baseUrl}}/admin/users?role=DONOR&isActive=true&search=Rahim&page=1&limit=10"
+method: GET
+headers:
+  Authorization: Bearer {{adminAccessToken}}
+queryParams:
+  role: DONOR
+  isActive: "true"
+  search: Rahim
+  page: "1"
+  limit: "10"
+order: 1000

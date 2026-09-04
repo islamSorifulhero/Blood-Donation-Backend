@@ -1,0 +1,19 @@
+$kind: http-request
+url: "{{baseUrl}}/donations"
+method: POST
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{donorAccessToken}}
+body:
+  type: json
+  content: |-
+    {
+      "requestMatchId": "{{matchId}}",
+      "donationDate": "2026-09-10T09:00:00.000Z",
+      "location": "City General Hospital Blood Bank"
+    }
+scripts:
+  - type: afterResponse
+    code: if (pm.response.code === 201) { pm.collectionVariables.set('donationId', pm.response.json().data.id); }
+    language: text/javascript
+order: 1000

@@ -1,0 +1,13 @@
+$kind: http-request
+url: "{{baseUrl}}/donations/{{donationId}}/reschedule"
+method: PATCH
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{donorAccessToken}}
+body:
+  type: json
+  content: |-
+    {
+      "donationDate": "2026-09-12T09:00:00.000Z"
+    }
+order: 5000

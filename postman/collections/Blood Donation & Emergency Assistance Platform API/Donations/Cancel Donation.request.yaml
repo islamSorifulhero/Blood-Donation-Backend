@@ -1,0 +1,13 @@
+$kind: http-request
+url: "{{baseUrl}}/donations/{{donationId}}/cancel"
+method: PATCH
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{donorAccessToken}}
+body:
+  type: json
+  content: |-
+    {
+      "reason": "Donor unavailable"
+    }
+order: 6000

@@ -1,0 +1,15 @@
+$kind: http-request
+name: Update User Status (activate/deactivate)
+url: "{{baseUrl}}/admin/users/{{userId}}/status"
+method: PATCH
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{adminAccessToken}}
+body:
+  type: json
+  content: |-
+    {
+      "isActive": false,
+      "reason": "Policy violation"
+    }
+order: 3000

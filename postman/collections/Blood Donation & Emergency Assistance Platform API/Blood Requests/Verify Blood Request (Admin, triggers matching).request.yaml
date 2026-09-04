@@ -1,0 +1,14 @@
+$kind: http-request
+description: Approving runs the donor-matching engine (compatibility + eligibility + location radius) in the same transaction.
+url: "{{baseUrl}}/blood-requests/{{bloodRequestId}}/verify"
+method: PATCH
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{adminAccessToken}}
+body:
+  type: json
+  content: |-
+    {
+      "isVerified": true
+    }
+order: 5000

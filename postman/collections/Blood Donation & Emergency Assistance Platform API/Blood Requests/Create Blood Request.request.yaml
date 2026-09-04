@@ -1,0 +1,27 @@
+$kind: http-request
+description: Hospital must be admin-verified first (see Verify Hospital).
+url: "{{baseUrl}}/blood-requests"
+method: POST
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{hospitalAccessToken}}
+body:
+  type: json
+  content: |-
+    {
+      "patientName": "Anika Islam",
+      "patientAge": 34,
+      "bloodGroup": "O_POSITIVE",
+      "unitsNeeded": 2,
+      "urgency": "CRITICAL",
+      "reason": "Emergency surgery",
+      "requiredBy": "2026-12-31T00:00:00.000Z",
+      "city": "Dhaka",
+      "latitude": 23.75,
+      "longitude": 90.38
+    }
+scripts:
+  - type: afterResponse
+    code: if (pm.response.code === 201) { pm.collectionVariables.set('bloodRequestId', pm.response.json().data.id); }
+    language: text/javascript
+order: 1000

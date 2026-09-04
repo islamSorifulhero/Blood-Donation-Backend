@@ -1,0 +1,13 @@
+$kind: http-request
+url: "{{baseUrl}}/blood-requests/{{bloodRequestId}}/matches/{{matchId}}/respond"
+method: PATCH
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{donorAccessToken}}
+body:
+  type: json
+  content: |-
+    {
+      "response": "ACCEPTED"
+    }
+order: 7000

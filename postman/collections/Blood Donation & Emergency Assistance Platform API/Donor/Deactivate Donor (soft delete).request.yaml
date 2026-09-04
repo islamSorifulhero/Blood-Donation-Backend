@@ -1,0 +1,6 @@
+$kind: http-request
+url: "{{baseUrl}}/donors/{{donorId}}"
+method: DELETE
+headers:
+  Authorization: Bearer {{adminAccessToken}}
+order: 5000

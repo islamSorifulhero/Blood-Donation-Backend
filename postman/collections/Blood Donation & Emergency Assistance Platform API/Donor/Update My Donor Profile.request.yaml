@@ -1,0 +1,14 @@
+$kind: http-request
+url: "{{baseUrl}}/donors/me"
+method: PATCH
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{donorAccessToken}}
+body:
+  type: json
+  content: |-
+    {
+      "isAvailable": true,
+      "city": "Dhaka"
+    }
+order: 2000

@@ -1,0 +1,6 @@
+$kind: http-request
+url: "{{baseUrl}}/hospitals/me"
+method: GET
+headers:
+  Authorization: Bearer {{hospitalAccessToken}}
+order: 1000

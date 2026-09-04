@@ -1,0 +1,7 @@
+$kind: http-request
+description: Call this with a DONOR token to demonstrate a 403 Forbidden from the role middleware.
+url: "{{baseUrl}}/auth/admin-only-check"
+method: GET
+headers:
+  Authorization: Bearer {{donorAccessToken}}
+order: 9000

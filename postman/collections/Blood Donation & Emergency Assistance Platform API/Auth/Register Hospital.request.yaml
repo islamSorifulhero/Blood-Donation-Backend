@@ -1,0 +1,26 @@
+$kind: http-request
+description: Register a new hospital account (starts unverified — admin must verify before it can create requests).
+url: "{{baseUrl}}/auth/register/hospital"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "name": "Dr. Karim (Admin Contact)",
+      "email": "hospital1@example.com",
+      "phone": "+8801700000002",
+      "password": "Passw0rd!",
+      "hospitalName": "City General Hospital",
+      "registrationNumber": "HOSP-REG-00123",
+      "address": "45 Mirpur Road",
+      "city": "Dhaka",
+      "latitude": 23.7806,
+      "longitude": 90.367
+    }
+scripts:
+  - type: afterResponse
+    code: if (pm.response.code === 201) { const data = pm.response.json().data; pm.collectionVariables.set('hospitalAccessToken', data.accessToken); }
+    language: text/javascript
+order: 2000

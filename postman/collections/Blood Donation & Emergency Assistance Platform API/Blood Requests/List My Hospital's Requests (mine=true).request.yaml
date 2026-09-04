@@ -1,0 +1,10 @@
+$kind: http-request
+url: "{{baseUrl}}/blood-requests?mine=true&page=1&limit=10"
+method: GET
+headers:
+  Authorization: Bearer {{hospitalAccessToken}}
+queryParams:
+  mine: "true"
+  page: "1"
+  limit: "10"
+order: 3000

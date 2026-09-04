@@ -1,0 +1,10 @@
+$kind: http-request
+url: "{{baseUrl}}/notifications?isRead=false&page=1&limit=10"
+method: GET
+headers:
+  Authorization: Bearer {{donorAccessToken}}
+queryParams:
+  isRead: "false"
+  page: "1"
+  limit: "10"
+order: 1000

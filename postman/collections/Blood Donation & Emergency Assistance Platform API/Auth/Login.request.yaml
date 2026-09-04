@@ -1,0 +1,18 @@
+$kind: http-request
+description: Generic login — sets {{accessToken}}.
+url: "{{baseUrl}}/auth/login"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "email": "donor1@example.com",
+      "password": "Passw0rd!"
+    }
+scripts:
+  - type: afterResponse
+    code: if (pm.response.code === 200) { pm.collectionVariables.set('accessToken', pm.response.json().data.accessToken); }
+    language: text/javascript
+order: 3000

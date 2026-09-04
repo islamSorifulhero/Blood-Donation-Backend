@@ -1,0 +1,18 @@
+$kind: collection
+description: "B7A6 backend assignment — Node.js/TypeScript/Express/Prisma/PostgreSQL REST API. Run requests top-to-bottom within a folder: Register/Login first to populate token variables, then Create Blood Request → Verify (admin) → Respond to Match (donor) → Schedule Donation → Complete Donation."
+variables:
+  baseUrl: http://localhost:5000/api/v1
+  accessToken: ""
+  donorAccessToken: ""
+  hospitalAccessToken: ""
+  adminAccessToken: ""
+  adminEmail: admin@blooddonation.app
+  adminPassword: ChangeMe123!
+  donorId: ""
+  hospitalId: ""
+  bloodRequestId: ""
+  matchId: ""
+  donationId: ""
+  paymentId: ""
+  notificationId: ""
+  userId: ""

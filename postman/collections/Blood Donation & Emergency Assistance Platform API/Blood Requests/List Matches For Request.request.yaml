@@ -1,0 +1,10 @@
+$kind: http-request
+url: "{{baseUrl}}/blood-requests/{{bloodRequestId}}/matches"
+method: GET
+headers:
+  Authorization: Bearer {{hospitalAccessToken}}
+scripts:
+  - type: afterResponse
+    code: if (pm.response.code === 200) { const arr = pm.response.json().data; if (arr.length) pm.collectionVariables.set('matchId', arr[0].id); }
+    language: text/javascript
+order: 6000

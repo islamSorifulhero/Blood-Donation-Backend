@@ -1,0 +1,14 @@
+$kind: http-request
+description: Updates donor totalDonations/lastDonationDate AND the blood request's unitsFulfilled/status, atomically.
+url: "{{baseUrl}}/donations/{{donationId}}/complete"
+method: PATCH
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{hospitalAccessToken}}
+body:
+  type: json
+  content: |-
+    {
+      "unitsDonated": 1
+    }
+order: 4000

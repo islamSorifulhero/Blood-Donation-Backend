@@ -1,0 +1,15 @@
+$kind: http-request
+url: "{{baseUrl}}/payments/initiate"
+method: POST
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{accessToken}}
+body:
+  type: json
+  content: |-
+    {
+      "purpose": "PLATFORM_DONATION",
+      "provider": "STRIPE",
+      "amount": 200
+    }
+order: 3000

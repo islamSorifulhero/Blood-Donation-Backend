@@ -1,0 +1,18 @@
+$kind: http-request
+url: "{{baseUrl}}/payments/initiate"
+method: POST
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{hospitalAccessToken}}
+body:
+  type: json
+  content: |-
+    {
+      "purpose": "HOSPITAL_VERIFICATION_FEE",
+      "provider": "STRIPE"
+    }
+scripts:
+  - type: afterResponse
+    code: if (pm.response.code === 201) { pm.collectionVariables.set('paymentId', pm.response.json().data.paymentId); }
+    language: text/javascript
+order: 1000

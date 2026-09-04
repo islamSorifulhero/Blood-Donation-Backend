@@ -1,0 +1,10 @@
+$kind: http-request
+url: "{{baseUrl}}/donations?status=SCHEDULED&page=1&limit=10"
+method: GET
+headers:
+  Authorization: Bearer {{donorAccessToken}}
+queryParams:
+  status: SCHEDULED
+  page: "1"
+  limit: "10"
+order: 2000

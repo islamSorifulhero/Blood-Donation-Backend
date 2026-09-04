@@ -1,0 +1,13 @@
+$kind: http-request
+url: "{{baseUrl}}/blood-requests/{{bloodRequestId}}/cancel"
+method: PATCH
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{hospitalAccessToken}}
+body:
+  type: json
+  content: |-
+    {
+      "reason": "Patient discharged"
+    }
+order: 8000

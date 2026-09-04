@@ -1,0 +1,13 @@
+$kind: http-request
+url: "{{baseUrl}}/hospitals/me"
+method: PATCH
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{hospitalAccessToken}}
+body:
+  type: json
+  content: |-
+    {
+      "address": "45 Mirpur Road, Suite 2"
+    }
+order: 2000

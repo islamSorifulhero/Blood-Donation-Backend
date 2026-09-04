@@ -1,0 +1,10 @@
+$kind: http-request
+url: "{{baseUrl}}/admin/audit-logs?entityType=BloodRequest&page=1&limit=10"
+method: GET
+headers:
+  Authorization: Bearer {{adminAccessToken}}
+queryParams:
+  entityType: BloodRequest
+  page: "1"
+  limit: "10"
+order: 5000

@@ -1,0 +1,5 @@
+$kind: http-request
+description: Signed by Stripe itself (raw body + Stripe-Signature header). Test via `stripe listen --forward-to localhost:5000/api/v1/payments/webhook/stripe`.
+url: "{{baseUrl}}/payments/webhook/stripe"
+method: POST
+order: 6000

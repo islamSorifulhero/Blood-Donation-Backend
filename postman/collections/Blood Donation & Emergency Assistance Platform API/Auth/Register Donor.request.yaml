@@ -1,0 +1,28 @@
+$kind: http-request
+description: Register a new donor account.
+url: "{{baseUrl}}/auth/register/donor"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "name": "Rahim Uddin",
+      "email": "donor1@example.com",
+      "phone": "+8801700000001",
+      "password": "Passw0rd!",
+      "bloodGroup": "O_POSITIVE",
+      "dateOfBirth": "1998-05-10",
+      "gender": "MALE",
+      "weightKg": 68,
+      "address": "House 12, Road 5, Dhanmondi",
+      "city": "Dhaka",
+      "latitude": 23.7461,
+      "longitude": 90.3742
+    }
+scripts:
+  - type: afterResponse
+    code: if (pm.response.code === 201) { const data = pm.response.json().data; pm.collectionVariables.set('donorAccessToken', data.accessToken); }
+    language: text/javascript
+order: 1000

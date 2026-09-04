@@ -1,0 +1,6 @@
+$kind: http-request
+url: "{{baseUrl}}/donors/me"
+method: GET
+headers:
+  Authorization: Bearer {{donorAccessToken}}
+order: 1000

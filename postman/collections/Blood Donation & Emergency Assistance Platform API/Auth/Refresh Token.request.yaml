@@ -1,0 +1,10 @@
+$kind: http-request
+description: Uses the httpOnly refreshToken cookie automatically set by login/register.
+url: "{{baseUrl}}/auth/refresh-token"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: "{}"
+order: 6000
