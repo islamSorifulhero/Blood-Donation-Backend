@@ -20,7 +20,7 @@ const apiVersion = env.apiVersion || "v1";
 app.use(helmet());
 app.use(
   cors({
-    origin: env.clientUrl || "*", // Fallback to * if clientUrl is missing
+    origin: env.clientUrl || "*",
     credentials: true,
   })
 );
@@ -29,7 +29,6 @@ app.use(cookieParser());
 app.use(morgan(env.nodeEnv === "development" ? "dev" : "combined"));
 app.use(globalLimiter);
 
-// --- Root Route (Vercel-এ সরাসরি লিঙ্ক টেস্ট করার জন্য) ---
 app.get("/", (_req, res) => {
   res.status(200).json({
     success: true,
@@ -38,7 +37,6 @@ app.get("/", (_req, res) => {
   });
 });
 
-// NOTE: Stripe webhook raw body handler
 app.post(
   `/api/${apiVersion}/payments/webhook/stripe`,
   express.raw({ type: "application/json" }),
@@ -56,6 +54,6 @@ app.get("/health", (_req, res) => {
 // --- API routes ---
 app.use(`/api/${apiVersion}`, v1Router);
 
-// --- 404 + error handling (must be last) ---
+// --- 404 + error handling
 app.use(notFoundHandler);
 app.use(errorHandler);
