@@ -1,15 +1,23 @@
 {
   "version": 2,
+  "buildCommand": "prisma generate && tsup",
+  "outputDirectory": "dist",
+  "devCommand": "npm run dev",
   "builds": [
     {
-      "src": "dist/server.js",
-      "use": "@vercel/node"
+      "src": "src/server.ts",
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": [
+          "node_modules/.prisma/client/**"
+        ]
+      }
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "dist/server.js"
+      "dest": "src/server.ts"
     }
   ]
 }
