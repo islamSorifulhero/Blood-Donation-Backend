@@ -12,6 +12,8 @@ import { router as v1Router } from "./routes/v1";
 
 export const app: Application = express();
 
+app.set('trust proxy', 1);
+
 const apiVersion = env.apiVersion || "v1";
 
 // --- Security & core middleware ---
