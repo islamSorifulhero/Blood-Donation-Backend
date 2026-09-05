@@ -1,5 +1,3 @@
-import app from '../src/app';
+import { app } from "../src/app";
 
-export default (req: any, res: any) => {
-  return app(req, res);
-};
+export default app;

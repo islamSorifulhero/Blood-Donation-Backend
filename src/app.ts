@@ -12,11 +12,13 @@ import { router as v1Router } from "./routes/v1";
 
 export const app: Application = express();
 
+const apiVersion = env.apiVersion || "v1";
+
 // --- Security & core middleware ---
 app.use(helmet());
 app.use(
   cors({
-    origin: env.clientUrl,
+    origin: env.clientUrl || "*", // Fallback to * if clientUrl is missing
     credentials: true,
   })
 );
@@ -25,10 +27,18 @@ app.use(cookieParser());
 app.use(morgan(env.nodeEnv === "development" ? "dev" : "combined"));
 app.use(globalLimiter);
 
-// NOTE: the raw body for the Stripe webhook route must be registered
-// BEFORE express.json() — see routes/v1/payment.routes.ts for the pattern.
+// --- Root Route (Vercel-এ সরাসরি লিঙ্ক টেস্ট করার জন্য) ---
+app.get("/", (_req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "Blood Donation & Emergency Assistance Platform API is Live!",
+    version: apiVersion,
+  });
+});
+
+// NOTE: Stripe webhook raw body handler
 app.post(
-  `/api/${env.apiVersion}/payments/webhook/stripe`,
+  `/api/${apiVersion}/payments/webhook/stripe`,
   express.raw({ type: "application/json" }),
   stripeWebhookHandler
 );
@@ -42,7 +52,7 @@ app.get("/health", (_req, res) => {
 });
 
 // --- API routes ---
-app.use(`/api/${env.apiVersion}`, v1Router);
+app.use(`/api/${apiVersion}`, v1Router);
 
 // --- 404 + error handling (must be last) ---
 app.use(notFoundHandler);
