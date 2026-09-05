@@ -1,7 +1,5 @@
 {
   "version": 2,
-  "buildCommand": "prisma generate && tsup",
-  "devCommand": "npm run dev",
   "rewrites": [
     {
       "source": "/(.*)",
