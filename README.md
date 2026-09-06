@@ -1,101 +1,223 @@
 # Blood Donation & Emergency Assistance Platform — Backend
 
-Backend-only REST API (B7A6 assignment). Node.js + TypeScript + Express + PostgreSQL + Prisma + Zod + Redis.
+Backend-only REST API for the B7A6 assignment. Built with **Node.js, TypeScript, Express, PostgreSQL (Neon), Prisma ORM, Zod, and Redis**.
 
-## Roles
-- **DONOR** — registers, sets blood group/availability, responds to match notifications, logs donations.
-- **HOSPITAL** — verified accounts that create/manage emergency blood requests.
-- **ADMIN** — verifies hospitals & requests, moderates users, views audit logs & analytics.
+🚀 **Live API Base URL:** https://blood-donation-backend-bice.vercel.app
 
-## Full folder structure
-```
-src/
-  config/           env.ts, db.ts (Prisma singleton), redis.ts (optional — app runs without it)
-  middlewares/       auth (JWT), role (RBAC), validateRequest (Zod), rateLimiter, error
-  modules/
-    auth/            register (donor/hospital), login, Google sign-in, refresh/logout
-    user/            generic /users/me — works for any role (name/phone/avatar, change password)
-    donor/           donor profile CRUD, donor search/discovery (cached)
-    hospital/        hospital profile CRUD, admin verification workflow
-    bloodRequest/     create/list/verify/cancel, matches, donor response
-      matching.service.ts   the donor-matching engine (compatibility + eligibility + geo radius)
-    donation/        schedule → complete/cancel/no-show/reschedule
-    payment/         initiate, list, get
-      providers/     stripe.provider.ts, sslcommerz.provider.ts, types.ts, index.ts (registry)
-    notification/    list, unread count, mark read / mark all read
-    admin/           user management, dashboard stats, audit logs
-  routes/v1/         one router file per module + index.ts aggregator
-  utils/             ApiError, sendResponse, catchAsync, pagination, audit, notify,
-                     bloodCompatibility, geo, jwt, hash, parseDuration,
-                     generateTransactionId, cache (Redis read-through + version invalidation)
-  app.ts             Express app — NOTE: Stripe webhook is mounted here directly
-                     with express.raw(), BEFORE express.json()
-  server.ts          bootstrap + Prisma connect + Vercel export
-prisma/
-  schema.prisma      full data model
-  seed.ts            creates the demo admin user
-blood-donation-backend.postman_collection.json   <- import this into Postman
-```
+📡 **API Version Base URL:** https://blood-donation-backend-bice.vercel.app/api/v1
 
-## Data model highlights
-`User` -> `DonorProfile` / `HospitalProfile` (1:1) -> `BloodRequest` -> `RequestMatch` (donor<->request
-junction, `@@unique([bloodRequestId, donorProfileId])` stops duplicate assignment) -> `Donation` ->
-`Payment`, `Notification`, `AuditLog`, `RefreshToken`. Soft deletes (`deletedAt`) throughout.
-Indexes on bloodGroup/city/status/urgency for fast matching and search queries.
+---
 
-## What's implemented, end to end
+## 🚀 Project Overview
 
-1. **Auth** — email/password + Google (first-sign-up chooses DONOR/HOSPITAL), JWT access + rotating
-   refresh tokens (hashed at rest, httpOnly cookie), logout revokes the token.
-2. **Donor & Hospital modules** — self-service profile CRUD; hospital verification workflow
-   (admin-only, audit-logged, notifies the hospital).
-3. **Blood Request + matching engine** — create -> admin verify (triggers matching: blood-group
-   compatibility -> 90-day donor eligibility -> urgency-scaled location radius via Haversine ->
-   notification fan-out, capped and duplicate-safe) -> donor accepts/declines.
-4. **Donation module** — schedule from an accepted match -> **complete** (one transaction: donor
-   `totalDonations`/`lastDonationDate`, match status, request `unitsFulfilled`/status, audit log,
-   two notifications) -> or cancel/no-show/reschedule.
-5. **Payment module** — Stripe (Checkout Session + signature-verified webhook) and SSLCommerz
-   (session init + success/fail/cancel/IPN callbacks, each re-validated server-to-server) are fully
-   wired. bKash is left as a documented extension point in `providers/index.ts` (same adapter
-   interface) — not implemented in this pass.
-6. **Notification module** — list (filter by read/unread, paginated), unread count, mark one or all
-   as read.
-7. **Admin module** — user list/role/status management, dashboard analytics (donor/hospital counts,
-   request & donation breakdowns by status, this-month totals, successful payment volume, top
-   cities), and a full audit-log browser (filter by entity/action/actor/date range).
-8. **Redis caching** — `GET /donors` and the public view of `GET /blood-requests` are cached
-   read-through (`utils/cache.ts`) with a **versioned-key** strategy: every write that could change
-   list results (donor availability change, request create/verify/cancel, donation completion)
-   bumps a version counter instead of hunting down individual keys. Redis is optional — with no
-   `REDIS_URL`, caching silently no-ops and the app runs normally against the DB.
-9. **Cross-cutting**: consistent `{success,message,data}` response shape, Zod validation everywhere,
-   rate limiting (global / auth / request-creation), helmet + CORS, soft deletes, audit logs on every
-   critical mutation, pagination+filtering+sorting on every list endpoint.
+The Blood Donation & Emergency Assistance Platform is a backend REST API designed to connect blood donors with hospitals during emergency blood requirements.
 
-## API documentation
-Import **`blood-donation-backend.postman_collection.json`** into Postman. 9 folders, 54 requests:
-Auth, User, Donor, Hospital, Blood Requests, Donations, Payments, Notifications, Admin. Collection
-variables (`baseUrl`, `donorAccessToken`, `hospitalAccessToken`, `adminAccessToken`, `bloodRequestId`,
-`matchId`, `donationId`, `paymentId`, etc.) are auto-populated by test scripts on the key requests
-(Register, Login, Create Blood Request, List Matches, Schedule Donation, Initiate Payment) — run a
-folder top-to-bottom and you rarely need to copy an ID by hand.
+The system provides:
 
-Suggested demo order matching the full lifecycle:
-`Register Hospital -> Login as Admin -> Verify Hospital -> Create Blood Request -> Verify Blood Request
-(triggers matching) -> Register Donor (matching city/blood group) -> List Matches -> Donor Responds to
-Match -> Schedule Donation -> Complete Donation -> check Dashboard Stats & Audit Logs`.
+- Secure authentication and authorization
+- Donor and hospital management
+- Hospital verification
+- Emergency blood request management
+- Automatic donor matching
+- Blood compatibility checking
+- Donor eligibility checking
+- Location-based matching
+- Donation scheduling and completion
+- Online payment integration
+- Notifications
+- Admin dashboard and analytics
+- Audit logging
+- Redis caching
+- Rate limiting and security middleware
 
-## Setup
-```bash
-npm install
-cp .env.example .env   # fill in DATABASE_URL, JWT secrets, Stripe/SSLCommerz keys, etc.
-npx prisma generate
-npx prisma migrate dev --name init
-npx prisma db seed
-npm run dev
-```
+---
 
-## Status
-All planned modules are built and type-checked (`tsc --noEmit` clean, aside from the expected gap
-until you run `prisma generate` locally with network access).
+## 👥 User Roles
+
+### DONOR
+
+Donors can:
+
+- Register and login
+- Create and manage donor profiles
+- Set blood group
+- Set availability
+- Update location information
+- Receive blood match notifications
+- Accept or decline blood requests
+- Schedule donations
+- Complete, cancel, reschedule, or mark donations as no-show
+- View notifications
+- Track donation history
+
+### HOSPITAL
+
+Hospitals can:
+
+- Register and login
+- Create and manage hospital profiles
+- Submit emergency blood requests
+- View their blood requests
+- Manage request lifecycle
+- View matched donors
+- Manage donation-related activities
+- Make supported payments
+
+Hospital accounts require admin verification before they can create verified emergency blood requests.
+
+### ADMIN
+
+Admins can:
+
+- Manage users
+- Manage donor and hospital accounts
+- Verify hospitals
+- Verify blood requests
+- View dashboard analytics
+- View audit logs
+- Moderate users
+- Manage user status
+- Monitor requests and donations
+- Monitor payment activity
+
+---
+
+# 🏗️ Technology Stack
+
+| Technology | Purpose |
+|---|---|
+| Node.js | Runtime |
+| TypeScript | Type safety |
+| Express.js | REST API framework |
+| PostgreSQL | Relational database |
+| Neon PostgreSQL | Cloud database |
+| Prisma ORM | Database ORM |
+| Zod | Request validation |
+| JWT | Authentication |
+| bcrypt | Password hashing |
+| Redis | Optional caching |
+| Stripe | Payment integration |
+| SSLCommerz | Payment integration |
+| Helmet | HTTP security |
+| CORS | Cross-origin security |
+| Vercel | Deployment |
+| Postman | API testing/documentation |
+
+---
+
+# 📁 Full Folder Structure
+
+```text
+.
+├── api/
+│   └── index.ts
+│
+├── src/
+│   ├── config/
+│   │   ├── env.ts
+│   │   ├── db.ts
+│   │   └── redis.ts
+│   │
+│   ├── middlewares/
+│   │   ├── auth.ts
+│   │   ├── role.ts
+│   │   ├── validateRequest.ts
+│   │   ├── rateLimiter.ts
+│   │   └── error.ts
+│   │
+│   ├── modules/
+│   │   ├── auth/
+│   │   │   ├── register
+│   │   │   ├── login
+│   │   │   ├── Google sign-in
+│   │   │   ├── refresh
+│   │   │   └── logout
+│   │   │
+│   │   ├── user/
+│   │   │   └── generic /users/me
+│   │   │
+│   │   ├── donor/
+│   │   │   ├── donor profile CRUD
+│   │   │   └── donor search/discovery
+│   │   │
+│   │   ├── hospital/
+│   │   │   ├── hospital profile CRUD
+│   │   │   └── admin verification workflow
+│   │   │
+│   │   ├── bloodRequest/
+│   │   │   ├── create
+│   │   │   ├── list
+│   │   │   ├── verify
+│   │   │   ├── cancel
+│   │   │   ├── matches
+│   │   │   ├── donor response
+│   │   │   └── matching.service.ts
+│   │   │
+│   │   ├── donation/
+│   │   │   ├── schedule
+│   │   │   ├── complete
+│   │   │   ├── cancel
+│   │   │   ├── no-show
+│   │   │   └── reschedule
+│   │   │
+│   │   ├── payment/
+│   │   │   ├── initiate
+│   │   │   ├── list
+│   │   │   ├── get
+│   │   │   └── providers/
+│   │   │       ├── stripe.provider.ts
+│   │   │       ├── sslcommerz.provider.ts
+│   │   │       ├── types.ts
+│   │   │       └── index.ts
+│   │   │
+│   │   ├── notification/
+│   │   │   ├── list
+│   │   │   ├── unread count
+│   │   │   ├── mark read
+│   │   │   └── mark all read
+│   │   │
+│   │   └── admin/
+│   │       ├── user management
+│   │       ├── dashboard stats
+│   │       └── audit logs
+│   │
+│   ├── routes/
+│   │   └── v1/
+│   │       ├── auth.routes.ts
+│   │       ├── user.routes.ts
+│   │       ├── donor.routes.ts
+│   │       ├── hospital.routes.ts
+│   │       ├── bloodRequest.routes.ts
+│   │       ├── donation.routes.ts
+│   │       ├── payment.routes.ts
+│   │       ├── notification.routes.ts
+│   │       ├── admin.routes.ts
+│   │       └── index.ts
+│   │
+│   ├── utils/
+│   │   ├── ApiError.ts
+│   │   ├── sendResponse.ts
+│   │   ├── catchAsync.ts
+│   │   ├── pagination.ts
+│   │   ├── audit.ts
+│   │   ├── notify.ts
+│   │   ├── bloodCompatibility.ts
+│   │   ├── geo.ts
+│   │   ├── jwt.ts
+│   │   ├── hash.ts
+│   │   ├── parseDuration.ts
+│   │   ├── generateTransactionId.ts
+│   │   └── cache.ts
+│   │
+│   ├── app.ts
+│   └── server.ts
+│
+├── prisma/
+│   ├── schema.prisma
+│   └── seed.ts
+│
+├── .env.example
+├── package.json
+├── tsconfig.json
+├── vercel.json
+└── blood-donation-backend.postman_collection.json
