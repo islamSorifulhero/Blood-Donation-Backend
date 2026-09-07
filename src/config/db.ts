@@ -1,7 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { env } from "./env";
 
-// Prevent multiple PrismaClient instances in dev (hot-reload) / serverless warm starts
 declare global {
   // eslint-disable-next-line no-var
   var __prisma: PrismaClient | undefined;

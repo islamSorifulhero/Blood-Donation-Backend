@@ -1,25 +1,29 @@
 import { redis } from "../config/redis";
 
 /**
- * Versioned caching: each namespace (e.g. "donors", "blood-requests") has a
- * version counter in Redis. Cache keys embed the current version, so bumping
- * the version on any write instantly "invalidates" every previously-cached
- * filter/pagination combination for that namespace without having to track
- * or delete individual keys.
+ * Versioned caching: safely fallback to DB if Redis is down/closed.
  */
 export async function getCacheVersion(namespace: string): Promise<number> {
   if (!redis) return 0;
-  const v = await redis.get(`cache:version:${namespace}`);
-  return v ? Number(v) : 0;
+  try {
+    const v = await redis.get(`cache:version:${namespace}`);
+    return v ? Number(v) : 0;
+  } catch {
+    return 0; // Redis down থাকলেও 0 ব্যাক দিয়ে DB কোয়েরি হতে দিবে
+  }
 }
 
 export async function bumpCacheVersion(namespace: string): Promise<void> {
   if (!redis) return;
-  await redis.incr(`cache:version:${namespace}`).catch(() => undefined);
+  try {
+    await redis.incr(`cache:version:${namespace}`);
+  } catch {
+    // ignore cache write failures
+  }
 }
 
 export async function getCached<T>(key: string): Promise<T | null> {
-  if (!redis) return null;
+  if (!redis) return midnight;
   try {
     const raw = await redis.get(key);
     return raw ? (JSON.parse(raw) as T) : null;
