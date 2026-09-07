@@ -2,11 +2,21 @@
 
 Backend-only REST API for the B7A6 assignment. Built with **Node.js, TypeScript, Express, PostgreSQL (Neon), Prisma ORM, Zod, and Redis**.
 
-🚀 **Live API Base URL:** https://blood-donation-backend-bice.vercel.app
+## 🔗 Project Links
 
-📡 **API Version Base URL:** https://blood-donation-backend-bice.vercel.app/api/v1
+| Item | Link |
+|---|---|
+| **Project Name** | Blood Donation & Emergency Assistance Platform |
+| **Backend Repository** | [GitHub Repository](https://github.com/islamSorifulhero/Blood-Donation-Backend) |
+| **Live API** | [https://blood-donation-backend-bice.vercel.app](https://blood-donation-backend-bice.vercel.app) |
+| **API Documentation** | [Postman API Documentation](https://documenter.getpostman.com/view/54865231/2sBYAvvqZz) |
+| **Demo Video** | [Watch Demo Video](https://drive.google.com/file/d/1ajiBOU6a64_Q1J0jAtlcUxnXaSgHIrXh/view?usp=sharing) |
 
----
+### 🔐 Demo Admin Account
+
+**Email:** `admin@blooddonation.app`
+
+> **Password:** Provided separately for security. Do not expose credentials in the public repository.
 
 ## 🚀 Project Overview
 
