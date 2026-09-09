@@ -1,6 +1,3 @@
-// Blood Donation & Emergency Assistance Platform
-// Prisma Schema — PostgreSQL
-
 generator client {
   provider = "prisma-client-js"
   binaryTargets = ["native", "rhel-openssl-3.0.x"]
@@ -12,7 +9,6 @@ datasource db {
 }
 
 // ENUMS
-
 enum Role {
   DONOR
   HOSPITAL
@@ -80,9 +76,9 @@ enum PaymentProvider {
 }
 
 enum PaymentPurpose {
-  PRIORITY_REQUEST_FEE // hospital pays to boost/expedite an emergency request
-  HOSPITAL_VERIFICATION_FEE // one-time fee to get hospital account verified
-  PLATFORM_DONATION // monetary donation from any user to support the platform/blood drives
+  PRIORITY_REQUEST_FEE
+  HOSPITAL_VERIFICATION_FEE
+  PLATFORM_DONATION
 }
 
 enum PaymentStatus {
@@ -109,10 +105,10 @@ model User {
   name            String
   email           String       @unique
   phone           String?      @unique
-  password        String? // nullable: social-login users have no local password
+  password        String?
   role            Role
   provider        AuthProvider @default(LOCAL)
-  providerId      String? // Google sub id
+  providerId      String?
   avatar          String?
   isEmailVerified Boolean      @default(false)
   isActive        Boolean      @default(true)
@@ -262,7 +258,7 @@ model RequestMatch {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([bloodRequestId, donorProfileId]) // prevents duplicate donor assignment
+  @@unique([bloodRequestId, donorProfileId])
   @@index([status])
   @@map("request_matches")
 }
@@ -342,8 +338,8 @@ model AuditLog {
   id         String   @id @default(uuid())
   actorId    String?
   actor      User?    @relation("AuditActor", fields: [actorId], references: [id])
-  action     String // e.g. "VERIFY_REQUEST", "UPDATE_ROLE", "SOFT_DELETE_USER"
-  entityType String // e.g. "BloodRequest", "User"
+  action     String
+  entityType String
   entityId   String
   oldValue   Json?
   newValue   Json?
