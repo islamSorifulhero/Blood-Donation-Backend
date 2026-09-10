@@ -11,7 +11,6 @@ export function notFoundHandler(req: Request, res: Response) {
   });
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function errorHandler(err: unknown, req: Request, res: Response, next: NextFunction) {
   let statusCode = 500;
   let message = "Something went wrong";

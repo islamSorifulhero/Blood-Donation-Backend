@@ -24,7 +24,6 @@ export const authLimiter = rateLimit({
   },
 });
 
-// Tighter limit for creating emergency blood requests to prevent spam
 export const requestCreationLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
   max: 10,
