@@ -16,10 +16,8 @@ app.set('trust proxy', 1);
 
 const apiVersion = env.apiVersion || "v1";
 
-// --- Security & core middleware ---
 app.use(helmet());
 
-// ALLOWED ORIGINS FIX
 const allowedOrigins = [
   "http://localhost:3000",
   "https://blood-donation-frontend2026.vercel.app",
@@ -29,7 +27,6 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: (origin, callback) => {
-      // allow requests with no origin (like mobile apps or curl requests)
       if (!origin) return callback(null, true);
       if (allowedOrigins.includes(origin)) {
         return callback(null, true);
@@ -62,14 +59,11 @@ app.post(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// --- Health check ---
 app.get("/health", (_req, res) => {
   res.status(200).json({ success: true, message: "OK", data: { uptime: process.uptime() } });
 });
 
-// --- API routes ---
 app.use(`/api/${apiVersion}`, v1Router);
 
-// --- 404 + error handling
 app.use(notFoundHandler);
 app.use(errorHandler);
