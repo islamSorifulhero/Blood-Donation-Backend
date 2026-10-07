@@ -18,12 +18,28 @@ const apiVersion = env.apiVersion || "v1";
 
 // --- Security & core middleware ---
 app.use(helmet());
+
+// ALLOWED ORIGINS FIX
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://blood-donation-frontend2026.vercel.app",
+  ...(env.clientUrl ? [env.clientUrl] : []),
+];
+
 app.use(
   cors({
-    origin: env.clientUrl || "*",
+    origin: (origin, callback) => {
+      // allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error("Not allowed by CORS"));
+    },
     credentials: true,
   })
 );
+
 app.use(compression());
 app.use(cookieParser());
 app.use(morgan(env.nodeEnv === "development" ? "dev" : "combined"));
